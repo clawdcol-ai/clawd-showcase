@@ -1500,6 +1500,107 @@ app.use(<span class="keyword">function</span>(req, res, next) {
         </div>
         
         <div class="section">
+            <h2>⚡ Command Injection Testing</h2>
+            <p>Command injection testing was conducted to verify if the application allows execution of arbitrary system commands through user input.</p>
+            
+            <h3>Tested Scenarios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Payload</th>
+                        <th>Target</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Semicolon Injection</td>
+                        <td><code>;id</code></td>
+                        <td>/products?search=</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Pipe Injection</td>
+                        <td><code>|whoami</code></td>
+                        <td>/products?search=</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Backtick Injection</td>
+                        <td><code>`id`</code></td>
+                        <td>/products?search=</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Command Chaining</td>
+                        <td><code>;cat /etc/passwd</code></td>
+                        <td>/api/products/1</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>AND Operator</td>
+                        <td><code>&&ls -la</code></td>
+                        <td>/api/products/1</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>OR Operator</td>
+                        <td><code>||whoami</code></td>
+                        <td>/api/products/1</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Subshell</td>
+                        <td><code>$(whoami)</code></td>
+                        <td>/products?search=</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Ping Endpoint</td>
+                        <td><code>google.com;id</code></td>
+                        <td>/api/ping?host=</td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                        <td>DNS Lookup</td>
+                        <td><code>google.com|id</code></td>
+                        <td>/api/dns?domain=</td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="vuln-box medium">
+                <h4>✅ Command Injection Assessment</h4>
+                <p><strong>Status:</strong> No confirmed command injection vulnerabilities found</p>
+                
+                <h4>Findings</h4>
+                <ul>
+                    <li><strong>Input Sanitization:</strong> Special characters filtered/escaped</li>
+                    <li><strong>No Shell Execution:</strong> No evidence of shell command execution</li>
+                    <li><strong>No Diagnostic Endpoints:</strong> No ping, DNS, or system command features</li>
+                    <li><strong>Framework Protection:</strong> Next.js handles input safely</li>
+                </ul>
+                
+                <h4>Tested Operators</h4>
+                <div class="code-block">;   |   &&   ||   \`   $()   #   --   \n   \r</div>
+            </div>
+            
+            <h4>Conclusion</h4>
+            <p><strong>No command injection vulnerabilities were identified.</strong> The application does not appear to execute system commands based on user input, and all tested payloads were properly sanitized.</p>
+            
+            <div class="impact-box">
+                <h4>⚠️ Recommendations</h4>
+                <ol>
+                    <li>If system commands are needed in the future, use parameterized APIs (not shell execution)</li>
+                    <li>Implement strict input validation if any diagnostic features are added</li>
+                    <li>Run application with minimal system privileges</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>📞 Remediation Contact</h2>
             <p>For questions about remediating these vulnerabilities:</p>
             <ol>
