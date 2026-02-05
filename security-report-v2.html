@@ -578,10 +578,10 @@
             <div class="code-block">=== A03: Injection Tests ===
 
 [TEST] Cross-Site Scripting (XSS)
-  Payload: &lt;script&gt;alert(1)&lt;/script&gt;     → REFLECTED ⚠️
-  Payload: &lt;img src=x onerror=alert(1)&gt; → REFLECTED ⚠️
-  Payload: &lt;svg onload=alert(1)&gt;        → REFLECTED ⚠️
-  Payload: javascript:alert(1)          → REFLECTED ⚠️
+  Payload: &lt;script&gt;ALERT(1)&lt;/script&gt;     → REFLECTED ⚠️
+  Payload: &lt;img src=x onerror=ALERT(1)&gt; → REFLECTED ⚠️
+  Payload: &lt;svg onload=ALERT(1)&gt;        → REFLECTED ⚠️
+  Payload: javascript:ALERT(1)          → REFLECTED ⚠️
 
 [TEST] SQL Injection
   Payload: 1' OR '1'='1     → No error, returns product 1 ✅
@@ -599,7 +599,7 @@
                 <p><strong>Severity:</strong> <span class="badge badge-high">HIGH</span></p>
                 <p>The search parameter reflects user input without sanitization:</p>
                 <ul>
-                    <li>URL: <code>/products?search=&lt;script&gt;alert(1)&lt;/script&gt;</code></li>
+                    <li>URL: <code>/products?search=&lt;script&gt;ALERT(1)&lt;/script&gt;</code></li>
                     <li>Payload reflected in response without encoding</li>
                     <li>Exploitation: Session theft, keylogging, phishing</li>
                 </ul>
