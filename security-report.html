@@ -1060,42 +1060,6 @@ Sitemap: https://.../sitemap.xml</div>
         </div>
         
         <div class="section">
-            <h2>🧪 Testing Methodology</h2>
-            
-            <div class="methodology-grid">
-                <div class="methodology-card">
-                    <h4>Techniques Used</h4>
-                    <ul>
-                        <li>Passive reconnaissance (headers, common files)</li>
-                        <li>IDOR testing (direct object access)</li>
-                        <li>XSS testing (reflected and stored)</li>
-                        <li>Data exposure testing (API fields)</li>
-                        <li>Rate limiting verification</li>
-                        <li>Security headers analysis</li>
-                    </ul>
-                </div>
-                
-                <div class="methodology-card">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li>curl (manual API testing)</li>
-                        <li>web_fetch (content analysis)</li>
-                        <li>Manual HTTP header analysis</li>
-                    </ul>
-                </div>
-                
-                <div class="methodology-card">
-                    <h4>Limitations</h4>
-                    <ul>
-                        <li>No automated SQL Injection tests (requires more time)</li>
-                        <li>No CSRF vectors tested (requires authentication)</li>
-                        <li>No endpoint fuzzing (additional tools needed)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
             <h2>🧪 SQL Injection Testing</h2>
             <p>A comprehensive SQL Injection testing session was conducted on all available endpoints. <strong>No confirmed SQL Injection vulnerabilities were found.</strong></p>
             
@@ -1676,6 +1640,157 @@ app.use(<span class="keyword">function</span>(req, res, next) {
                     <li>Use bcrypt/Argon2 for password hashing</li>
                 </ol>
             </div>
+        </div>
+        
+        <div class="section">
+            <h2>🧪 Testing Methodology</h2>
+            <p>This security assessment was conducted using a comprehensive black-box testing approach. The following techniques and tests were performed:</p>
+            
+            <h3>Techniques Used</h3>
+            <div class="methodology-grid">
+                <div class="methodology-card">
+                    <h4>Initial Reconnaissance</h4>
+                    <ul>
+                        <li>Passive reconnaissance (headers, common files)</li>
+                        <li>Technology fingerprinting (Next.js detection)</li>
+                        <li>Endpoint discovery</li>
+                        <li>Security headers analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h4>Data Exposure Testing</h4>
+                    <ul>
+                        <li>API response analysis</li>
+                        <li>Field enumeration</li>
+                        <li>Sensitive data detection</li>
+                        <li>IDOR testing (direct object access)</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h4>Injection Testing</h4>
+                    <ul>
+                        <li>SQL Injection (classic, blind, time-based)</li>
+                        <li>XSS testing (reflected)</li>
+                        <li>Command Injection</li>
+                        <li>NoSQL Injection</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h4>Access Control Testing</h4>
+                    <ul>
+                        <li>CSRF testing</li>
+                        <li>SSRF testing</li>
+                        <li>Directory traversal</li>
+                        <li>Authentication/JWT testing</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h4>Rate Limiting</h4>
+                    <ul>
+                        <li>Request flooding</li>
+                        <li>Brute force simulation</li>
+                        <li>API throttling verification</li>
+                    </ul>
+                </div>
+                
+                <div class="methodology-card">
+                    <h4>Tools Used</h4>
+                    <ul>
+                        <li>curl (manual API testing)</li>
+                        <li>web_fetch (content analysis)</li>
+                        <li>Manual HTTP header analysis</li>
+                        <li>GitHub Pages (report hosting)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>Tests Performed Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Category</th>
+                        <th>Status</th>
+                        <th>Findings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SQL Injection</td>
+                        <td>✅ Completed</td>
+                        <td>No vulnerabilities found</td>
+                    </tr>
+                    <tr>
+                        <td>CSRF</td>
+                        <td>✅ Completed</td>
+                        <td>No tokens (potential HIGH risk)</td>
+                    </tr>
+                    <tr>
+                        <td>SSRF</td>
+                        <td>✅ Completed</td>
+                        <td>No vulnerabilities found</td>
+                    </tr>
+                    <tr>
+                        <td>Directory Traversal</td>
+                        <td>✅ Completed</td>
+                        <td>No vulnerabilities found</td>
+                    </tr>
+                    <tr>
+                        <td>Command Injection</td>
+                        <td>✅ Completed</td>
+                        <td>No vulnerabilities found</td>
+                    </tr>
+                    <tr>
+                        <td>JWT/Authentication</td>
+                        <td>✅ Completed</td>
+                        <td>No auth system (public site)</td>
+                    </tr>
+                    <tr>
+                        <td>Rate Limiting</td>
+                        <td>✅ Completed</td>
+                        <td>No limits (HIGH vulnerability)</td>
+                    </tr>
+                    <tr>
+                        <td>Security Headers</td>
+                        <td>✅ Completed</td>
+                        <td>Missing headers (HIGH)</td>
+                    </tr>
+                    <tr>
+                        <td>XSS</td>
+                        <td>✅ Completed</td>
+                        <td>Reflected XSS confirmed (HIGH)</td>
+                    </tr>
+                    <tr>
+                        <td>IDOR</td>
+                        <td>✅ Completed</td>
+                        <td>Sequential ID access (CRITICAL)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Limitations</h3>
+            <div class="impact-box">
+                <ul>
+                    <li><strong>Black-box only:</strong> No access to source code or server configuration</li>
+                    <li><strong>No automated scanners:</strong> Testing was manual (no OWASP ZAP, Burp Suite)</li>
+                    <li><strong>No authenticated testing:</strong> Application has no login functionality</li>
+                    <li><strong>Time constraints:</strong> Deep fuzzing and extensive testing not performed</li>
+                    <li><strong>Single environment:</strong> Only tested production/staging environment</li>
+                </ul>
+            </div>
+            
+            <h3>Recommendations for Future Testing</h3>
+            <ol>
+                <li>Conduct authenticated testing if login functionality is added</li>
+                <li>Use automated tools (OWASP ZAP, Burp Suite Pro) for comprehensive scanning</li>
+                <li>Perform code review of critical functions</li>
+                <li>Test with different user roles and permissions</li>
+                <li>Conduct business logic testing</li>
+                <li>Test API endpoints with different content types</li>
+            </ol>
         </div>
         
         <div class="section">
