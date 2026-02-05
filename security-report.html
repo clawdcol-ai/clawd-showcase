@@ -1305,6 +1305,107 @@ app.use(<span class="keyword">function</span>(req, res, next) {
         </div>
         
         <div class="section">
+            <h2>🌐 SSRF (Server-Side Request Forgery) Testing</h2>
+            <p>SSRF testing was conducted to verify if the application allows server-side requests to internal or unauthorized resources.</p>
+            
+            <h3>Tested Scenarios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Endpoint</th>
+                        <th>Payload</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Metadata Service Access</td>
+                        <td>/api/products/1</td>
+                        <td><code>?imageUrl=http://169.254.169.254/</code></td>
+                        <td>✅ Ignored</td>
+                    </tr>
+                    <tr>
+                        <td>Webhook SSRF</td>
+                        <td>/api/webhook</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                        <td>Proxy Endpoint</td>
+                        <td>/proxy</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                    <td>Image Proxy SSRF</td>
+                        <td>/_next/image</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Returns 400</td>
+                    </tr>
+                    <tr>
+                        <td>Import Feature</td>
+                        <td>/api/import</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                        <td>URL Preview</td>
+                        <td>/api/preview</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                        <td>URL Fetch</td>
+                        <td>/api/fetch</td>
+                        <td><code>?url=http://169.254.169.254/</code></td>
+                        <td>✅ Endpoint not found</td>
+                    </tr>
+                    <tr>
+                        <td>Localhost Access</td>
+                        <td>/api/products/1</td>
+                        <td><code>?callback=http://localhost:8080/</code></td>
+                        <td>✅ Ignored</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="vuln-box medium">
+                <h4>✅ SSRF Assessment</h4>
+                <p><strong>Status:</strong> No confirmed SSRF vulnerabilities found</p>
+                
+                <h4>Findings</h4>
+                <ul>
+                    <li><strong>No URL Fetching Endpoints:</strong> No evidence of server-side URL fetching functionality</li>
+                    <li><strong>Image Proxy Protected:</strong> Next.js image optimizer rejects external URLs with 400</li>
+                    <li><strong>No Webhook/Callback Features:</strong> No user-controlled callback URLs detected</li>
+                    <li><strong>No Import/Export URL Features:</strong> No file import from URL functionality</li>
+                </ul>
+                
+                <h4>Test Targets</h4>
+                <p>The following internal targets were used for SSRF testing:</p>
+                <ul>
+                    <li><code>169.254.169.254</code> - AWS/Azure metadata service</li>
+                    <li><code>localhost:8080</code> - Local services</li>
+                    <li><code>127.0.0.1</code> - Loopback interface</li>
+                </ul>
+            </div>
+            
+            <h4>Conclusion</h4>
+            <p><strong>No SSRF vulnerabilities were identified</strong> during testing. The application does not appear to have functionality that makes server-side requests based on user input.</p>
+            
+            <div class="impact-box">
+                <h4>⚠️ Note</h4>
+                <p>While no SSRF was found, it is recommended to:</p>
+                <ol>
+                    <li>Review all code that makes HTTP requests</li>
+                    <li>Implement URL validation/whitelisting if URL fetching is needed</li>
+                    <li>Block access to internal IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.169.254)</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>📞 Remediation Contact</h2>
             <p>For questions about remediating these vulnerabilities:</p>
             <ol>
