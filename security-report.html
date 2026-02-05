@@ -1406,6 +1406,100 @@ app.use(<span class="keyword">function</span>(req, res, next) {
         </div>
         
         <div class="section">
+            <h2>📁 Directory Traversal Testing</h2>
+            <p>Directory traversal (path traversal) testing was conducted to verify if the application allows access to files outside the intended directory structure.</p>
+            
+            <h3>Tested Scenarios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Payload</th>
+                        <th>Target</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Basic Path Traversal</td>
+                        <td><code>../../../etc/passwd</code></td>
+                        <td>/images/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>URL Encoded</td>
+                        <td><code>%2e%2e%2f%2e%2e%2fetc%2fpasswd</code></td>
+                        <td>/images/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Double URL Encoded</td>
+                        <td><code>%252e%252e%252fetc%252fpasswd</code></td>
+                        <td>/images/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Null Byte Injection</td>
+                        <td><code>../../../etc/passwd%00.jpg</code></td>
+                        <td>/images/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Windows Style</td>
+                        <td><code>..\..\..\windows\system32\drivers\etc\hosts</code></td>
+                        <td>/images/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>API Path Traversal</td>
+                        <td><code>../../../../etc/passwd</code></td>
+                        <td>/api/</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                    <tr>
+                        <td>Dot-Slash Variation</td>
+                        <td><code>....//....//etc/passwd</code></td>
+                        <td>Root</td>
+                        <td>✅ Blocked</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="vuln-box medium">
+                <h4>✅ Directory Traversal Assessment</h4>
+                <p><strong>Status:</strong> No confirmed directory traversal vulnerabilities found</p>
+                
+                <h4>Findings</h4>
+                <ul>
+                    <li><strong>Path Sanitization Active:</strong> All traversal attempts redirected to homepage</li>
+                    <li><strong>Next.js Protection:</strong> Framework appears to handle static file serving securely</li>
+                    <li><strong>No File Download Endpoints:</strong> No user-controlled file access functionality detected</li>
+                    <li><strong>API Protected:</strong> API routes properly validate input</li>
+                </ul>
+                
+                <h4>Test Targets</h4>
+                <ul>
+                    <li><code>/etc/passwd</code> - Unix user file</li>
+                    <li><code>/windows/system32/drivers/etc/hosts</code> - Windows hosts file</li>
+                    <li><code>../../config</code> - Application configuration</li>
+                </ul>
+            </div>
+            
+            <h4>Conclusion</h4>
+            <p><strong>No directory traversal vulnerabilities were identified.</strong> The application properly sanitizes user input and prevents access to files outside the intended directory structure.</p>
+            
+            <div class="remediation-box">
+                <h4>Best Practices (for future development)</h4>
+                <ol>
+                    <li>Use built-in framework functions for file access (Next.js static file serving)</li>
+                    <li>Validate and sanitize all user-supplied filenames</li>
+                    <li>Use allowlists for acceptable file paths</li>
+                    <li>Run application with minimal file system permissions</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>📞 Remediation Contact</h2>
             <p>For questions about remediating these vulnerabilities:</p>
             <ol>
