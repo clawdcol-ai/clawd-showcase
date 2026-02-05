@@ -578,9 +578,9 @@
             <div class="code-block">=== A03: Injection Tests ===
 
 [TEST] Cross-Site Scripting (XSS)
-  Payload: <script>alert(1)</script>     → REFLECTED ⚠️
-  Payload: <img src=x onerror=alert(1)> → REFLECTED ⚠️
-  Payload: <svg onload=alert(1)>        → REFLECTED ⚠️
+  Payload: &lt;script&gt;alert(1)&lt;/script&gt;     → REFLECTED ⚠️
+  Payload: &lt;img src=x onerror=alert(1)&gt; → REFLECTED ⚠️
+  Payload: &lt;svg onload=alert(1)&gt;        → REFLECTED ⚠️
   Payload: javascript:alert(1)          → REFLECTED ⚠️
 
 [TEST] SQL Injection
