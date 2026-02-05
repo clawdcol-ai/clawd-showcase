@@ -366,12 +366,12 @@
                     <div class="stat-label">Critical Findings</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">3</div>
+                    <div class="stat-number">4</div>
                     <div class="stat-label">High Severity</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">~2min</div>
-                    <div class="stat-label">Execution Time</div>
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Total Vulnerabilities</div>
                 </div>
             </div>
         </div>
@@ -569,6 +569,340 @@
                     <li>No sensitive data detected in URL parameters</li>
                 </ul>
             </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔴 A03: Injection - Framework Results</h2>
+            
+            <h3>Cross-Site Scripting (XSS) - REFLECTED</h3>
+            <div class="code-block">=== A03: Injection Tests ===
+
+[TEST] Cross-Site Scripting (XSS)
+  Payload: <script>alert(1)</script>     → REFLECTED ⚠️
+  Payload: <img src=x onerror=alert(1)> → REFLECTED ⚠️
+  Payload: <svg onload=alert(1)>        → REFLECTED ⚠️
+  Payload: javascript:alert(1)          → REFLECTED ⚠️
+
+[TEST] SQL Injection
+  Payload: 1' OR '1'='1     → No error, returns product 1 ✅
+  Payload: 1 AND 1=1        → Returns product 1 ✅
+  Payload: 1 AND 1=2        → Returns product 1 ✅
+  Payload: 1 AND SLEEP(5)   → No delay (~0.3s) ✅
+
+[TEST] Command Injection
+  Payload: ;id      → Blocked ✅
+  Payload: |whoami  → Blocked ✅
+  Payload: `id`     → Blocked ✅</div>
+            
+            <div class="result-box">
+                <h4>⚠️ XSS Vulnerability Confirmed</h4>
+                <p><strong>Severity:</strong> <span class="badge badge-high">HIGH</span></p>
+                <p>The search parameter reflects user input without sanitization:</p>
+                <ul>
+                    <li>URL: <code>/products?search=&lt;script&gt;alert(1)&lt;/script&gt;</code></li>
+                    <li>Payload reflected in response without encoding</li>
+                    <li>Exploitation: Session theft, keylogging, phishing</li>
+                </ul>
+                <p><strong>Framework Detection:</strong> Automated payload testing confirmed reflection of all XSS vectors.</p>
+            </div>
+            
+            <div class="result-box" style="border-left-color: #28a745;">
+                <h4>✅ SQL Injection - Safe</h4>
+                <p>No SQL injection vulnerabilities detected. Application appears to use parameterized queries or proper input validation.</p>
+            </div>
+            
+            <div class="result-box" style="border-left-color: #28a745;">
+                <h4>✅ Command Injection - Safe</h4>
+                <p>No command injection vulnerabilities detected. User input is not passed to system commands.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔴 A05: Security Misconfiguration - Framework Results</h2>
+            
+            <h3>Missing Security Headers</h3>
+            <div class="code-block">=== A05: Security Misconfiguration Tests ===
+
+[TEST] Security Headers Analysis
+  ✗ X-Content-Type-Options: MISSING ⚠️
+  ✗ X-Frame-Options: MISSING ⚠️
+  ✗ X-XSS-Protection: MISSING ⚠️
+  ✗ Content-Security-Policy: MISSING ⚠️
+  ✗ Strict-Transport-Security: MISSING ⚠️
+  ✗ Referrer-Policy: MISSING ⚠️
+
+[TEST] Information Disclosure
+  X-Powered-By: Next.js  ← Information Disclosure
+
+[TEST] HTTP Methods
+  GET: 200    POST: 200   PUT: 200    DELETE: 200
+  PATCH: 200  OPTIONS: 200  TRACE: 200</div>
+            
+            <div class="result-box">
+                <h4>⚠️ Missing Security Headers</h4>
+                <p><strong>Severity:</strong> <span class="badge badge-high">HIGH</span></p>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Purpose</th>
+                            <th>Risk without it</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>X-Content-Type-Options</td>
+                            <td>Prevent MIME sniffing</td>
+                            <td>Malicious code execution</td>
+                        </tr>
+                        <tr>
+                            <td>X-Frame-Options</td>
+                            <td>Prevent clickjacking</td>
+                            <td>UI redressing attacks</td>
+                        </tr>
+                        <tr>
+                            <td>Content-Security-Policy</td>
+                            <td>Control loaded resources</td>
+                            <td>XSS, data injection</td>
+                        </tr>
+                        <tr>
+                            <td>Strict-Transport-Security</td>
+                            <td>Force HTTPS</td>
+                            <td>Downgrade attacks</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>No Rate Limiting</h3>
+            <div class="code-block">=== Rate Limiting Test ===
+
+Sending 10 requests in rapid succession...
+  Request 1: 200,0.234
+  Request 2: 200,0.189
+  Request 3: 200,0.245
+  Request 4: 200,0.198
+  Request 5: 200,0.267
+  Request 6: 200,0.201
+  Request 7: 200,0.234
+  Request 8: 200,0.198
+  Request 9: 200,0.276
+  Request 10: 200,0.189
+
+⚠️ No rate limiting detected - all requests successful</div>
+            
+            <div class="result-box">
+                <h4>⚠️ No Rate Limiting</h4>
+                <p><strong>Severity:</strong> <span class="badge badge-high">HIGH</span></p>
+                <ul>
+                    <li>10 requests in < 1 second - all returned HTTP 200</li>
+                    <li>No delay or blocking mechanism detected</li>
+                    <li>Risks: Brute force attacks, data scraping, DoS</li>
+                </ul>
+            </div>
+            
+            <h3>Information Disclosure</h3>
+            <div class="result-box">
+                <h4>⚠️ Technology Disclosure</h4>
+                <p><strong>Severity:</strong> <span class="badge badge-medium">MEDIUM</span></p>
+                <ul>
+                    <li><code>X-Powered-By: Next.js</code> reveals technology stack</li>
+                    <li>Facilitates targeted attacks against known vulnerabilities</li>
+                </ul>
+            </div>
+            
+            <h3>SEO Files Misconfigured</h3>
+            <div class="result-box">
+                <h4>⚠️ robots.txt / sitemap.xml</h4>
+                <p><strong>Severity:</strong> <span class="badge badge-medium">MEDIUM</span></p>
+                <ul>
+                    <li><code>GET /robots.txt</code> → Returns HTML instead of text</li>
+                    <li><code>GET /sitemap.xml</code> → Returns HTML instead of XML</li>
+                    <li>Impact: SEO negatively affected, crawler confusion</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔴 A07: Authentication - Framework Results</h2>
+            
+            <div class="code-block">=== A07: Authentication Tests ===
+
+[TEST] Login Endpoints Detection
+  /login: HTTP 200 (Returns homepage)
+  /api/login: Not found
+  /admin/login: Not found
+  /signin: Not found
+
+[TEST] Session Management
+  No session cookies detected
+  No JWT tokens required
+
+[TEST] Brute Force Protection
+  No authentication endpoints to test</div>
+            
+            <div class="result-box" style="border-left-color: #17a2b8;">
+                <h4>ℹ️ No Authentication System</h4>
+                <p><strong>Status:</strong> Public Application</p>
+                <p>The application is intentionally public (e-commerce catalog). No authentication vulnerabilities were found because no authentication system exists.</p>
+                <p><strong>Note:</strong> If authentication is added in the future, CSRF protection will be required (currently missing).</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🟢 A10: SSRF - Framework Results</h2>
+            
+            <div class="code-block">=== A10: SSRF Tests ===
+
+[TEST] URL-based SSRF
+  http://169.254.169.254/  → Not accessible ✅
+  http://localhost:8080/   → Not accessible ✅
+  file:///etc/passwd       → Not accessible ✅
+
+[TEST] Webhook SSRF
+  /api/webhook: Not found ✅
+  /api/fetch: Not found ✅
+  /api/proxy: Not found ✅
+
+[TEST] Callback Parameters
+  /api/products/1?callback=http://internal.server/ → Ignored ✅</div>
+            
+            <div class="result-box" style="border-left-color: #28a745;">
+                <h4>✅ No SSRF Vulnerabilities</h4>
+                <p><strong>Status:</strong> Safe</p>
+                <ul>
+                    <li>No server-side URL fetching functionality detected</li>
+                    <li>Next.js image optimizer rejects external URLs (400 response)</li>
+                    <li>No webhook or callback endpoints found</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Complete Vulnerability Summary</h2>
+            
+            <h3>🔴 Critical (2)</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vulnerability</th>
+                        <th>OWASP</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SEC-001</td>
+                        <td>Massive Database Data Exposure</td>
+                        <td>A01</td>
+                        <td><span class="badge badge-critical">CRITICAL</span></td>
+                    </tr>
+                    <tr>
+                        <td>SEC-002</td>
+                        <td>IDOR - Insecure Direct Object Reference</td>
+                        <td>A01</td>
+                        <td><span class="badge badge-critical">CRITICAL</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>🟠 High (4)</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vulnerability</th>
+                        <th>OWASP</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SEC-003</td>
+                        <td>Reflected Cross-Site Scripting (XSS)</td>
+                        <td>A03</td>
+                        <td><span class="badge badge-high">HIGH</span></td>
+                    </tr>
+                    <tr>
+                        <td>SEC-004</td>
+                        <td>No Rate Limiting</td>
+                        <td>A05</td>
+                        <td><span class="badge badge-high">HIGH</span></td>
+                    </tr>
+                    <tr>
+                        <td>SEC-005</td>
+                        <td>Missing Security Headers (6 headers)</td>
+                        <td>A05</td>
+                        <td><span class="badge badge-high">HIGH</span></td>
+                    </tr>
+                    <tr>
+                        <td>SEC-006</td>
+                        <td>CSRF Protection Missing</td>
+                        <td>A01</td>
+                        <td><span class="badge badge-high">HIGH</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>🟡 Medium (2)</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vulnerability</th>
+                        <th>OWASP</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SEC-007</td>
+                        <td>Information Disclosure (X-Powered-By)</td>
+                        <td>A05</td>
+                        <td><span class="badge badge-medium">MEDIUM</span></td>
+                    </tr>
+                    <tr>
+                        <td>SEC-008</td>
+                        <td>SEO Files Misconfigured</td>
+                        <td>A05</td>
+                        <td><span class="badge badge-medium">MEDIUM</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>🟢 Safe / No Vulnerability (4)</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>OWASP</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SQL Injection</td>
+                        <td>A03</td>
+                        <td><span class="badge badge-success">SAFE</span></td>
+                    </tr>
+                    <tr>
+                        <td>Command Injection</td>
+                        <td>A03</td>
+                        <td><span class="badge badge-success">SAFE</span></td>
+                    </tr>
+                    <tr>
+                        <td>Path Traversal</td>
+                        <td>A01</td>
+                        <td><span class="badge badge-success">SAFE</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server-Side Request Forgery (SSRF)</td>
+                        <td>A10</td>
+                        <td><span class="badge badge-success">SAFE</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <div class="section">
