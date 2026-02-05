@@ -1198,6 +1198,113 @@ Sitemap: https://.../sitemap.xml</div>
         </div>
         
         <div class="section">
+            <h2>🛡️ CSRF (Cross-Site Request Forgery) Testing</h2>
+            <p>CSRF testing was conducted to verify if the application properly validates the origin of state-changing requests.</p>
+            
+            <h3>Tested Scenarios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Target</th>
+                        <th>Payload/Method</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CSRF Token Presence</td>
+                        <td>Newsletter Form</td>
+                        <td>Inspect HTML for tokens</td>
+                        <td>⚠️ No token found</td>
+                    </tr>
+                    <tr>
+                        <td>POST without Token</td>
+                        <td>/api/newsletter</td>
+                        <td>Direct POST without CSRF token</td>
+                        <td>⚠️ Accepted (error response)</td>
+                    </tr>
+                    <tr>
+                        <td>CORS Headers</td>
+                        <td>All endpoints</td>
+                        <td>OPTIONS request with Origin</td>
+                        <td>⚠️ No CORS headers set</td>
+                    </tr>
+                    <tr>
+                        <td>Cross-Origin POST</td>
+                        <td>/api/newsletter</td>
+                        <td>POST with malicious Origin</td>
+                        <td>⚠️ Accepted</td>
+                    </tr>
+                    <tr>
+                        <td>SameSite Cookies</td>
+                        <td>Session cookies</td>
+                        <td>Check cookie attributes</td>
+                        <td>✅ No session cookies found</td>
+                    </tr>
+                    <tr>
+                        <td>Referer Validation</td>
+                        <td>/api/newsletter</td>
+                        <td>POST with fake Referer</td>
+                        <td>⚠️ No validation detected</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="vuln-box high">
+                <h4>⚠️ Potential CSRF Vulnerability</h4>
+                <p><strong>Severity:</strong> HIGH (if authenticated endpoints exist)</p>
+                
+                <h4>Findings</h4>
+                <ul>
+                    <li><strong>No CSRF Tokens:</strong> Forms do not include CSRF protection tokens</li>
+                    <li><strong>No CORS Policy:</strong> Missing Access-Control-Allow-Origin headers</li>
+                    <li><strong>No SameSite Cookies:</strong> Session management appears stateless</li>
+                    <li><strong>No Referer Validation:</strong> Requests accepted from any origin</li>
+                </ul>
+                
+                <h4>Risk Assessment</h4>
+                <p>While the tested newsletter endpoint returned errors, the lack of CSRF protection mechanisms suggests <strong>authenticated endpoints would be vulnerable</strong> if they exist. An attacker could potentially:</p>
+                <ul>
+                    <li>Forge requests on behalf of logged-in users</li>
+                    <li>Submit forms from malicious websites</li>
+                    <li>Perform actions without user consent</li>
+                </ul>
+            </div>
+            
+            <h4>Proof of Concept</h4>
+            <div class="code-block">&lt;!-- Malicious website could submit this form --&gt;
+&lt;form action="https://target.com/api/newsletter" method="POST" id="csrf-form"&gt;
+  &lt;input type="hidden" name="email" value="attacker@evil.com"&gt;
+&lt;/form&gt;
+&lt;script&gt;document.getElementById('csrf-form').submit();&lt;/script&gt;</div>
+            
+            <div class="remediation-box">
+                <h4>Remediation</h4>
+                <ol>
+                    <li><strong>Implement CSRF Tokens:</strong> Add unique tokens to all state-changing forms</li>
+                    <li><strong>SameSite Cookies:</strong> Set <code>SameSite=Strict</code> or <code>SameSite=Lax</code> on session cookies</li>
+                    <li><strong>Referer Header Check:</strong> Validate Referer/Origin headers match expected domain</li>
+                    <li><strong>CORS Policy:</strong> Implement proper CORS configuration</li>
+                </ol>
+                <div class="code-block"><span class="comment">// Example CSRF protection middleware</span>
+<span class="keyword">const</span> csrf = require(<span class="string">'csurf'</span>);
+<span class="keyword">const</span> csrfProtection = csrf({ cookie: <span class="keyword">true</span> });
+
+app.use(csrfProtection);
+app.use(<span class="keyword">function</span>(req, res, next) {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});</div>
+            </div>
+            
+            <div class="impact-box">
+                <h4>⚠️ Note</h4>
+                <p>The newsletter endpoint returned generic errors, preventing confirmation of successful CSRF exploitation. However, the <strong>absence of protection mechanisms</strong> is itself a vulnerability that should be addressed.</p>
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>📞 Remediation Contact</h2>
             <p>For questions about remediating these vulnerabilities:</p>
             <ol>
