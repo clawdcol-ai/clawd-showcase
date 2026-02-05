@@ -1,30 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Clawd Showcase</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clawd Security & Performance Showcase</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
             min-height: 100vh;
+            color: white;
         }
-        h1 {
+        
+        /* Login Modal */
+        #loginModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .login-box h1 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .login-box .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .lock-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Main Content */
+        #mainContent {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
             text-align: center;
             margin-bottom: 40px;
         }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 16px;
+        }
+        
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 100;
+        }
+        
         .section-title {
             color: rgba(255,255,255,0.8);
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 30px 0 15px 0;
+            margin: 40px 0 15px 0;
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.2);
         }
+        
         .report-card {
             background: white;
             color: #333;
@@ -32,15 +166,26 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
         }
+        
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        
         .report-card h2 {
             margin-top: 0;
             color: #1a1a2e;
+            font-size: 22px;
         }
+        
         .report-card p {
             color: #555;
             line-height: 1.6;
+            margin: 10px 0;
         }
+        
         .btn {
             display: inline-block;
             padding: 12px 24px;
@@ -50,80 +195,203 @@
             border-radius: 8px;
             margin-top: 15px;
             font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
+        
         .btn-performance {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
         }
+        
         .btn-performance:hover {
             box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
         }
+        
         .badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 600;
             margin-left: 10px;
         }
+        
         .badge-new {
             background: #d4edda;
             color: #155724;
         }
+        
         .badge-score {
             background: #d4edda;
             color: #155724;
-            font-size: 14px;
-            padding: 6px 12px;
+            font-size: 13px;
         }
+        
+        .badge-critical {
+            background: #fee;
+            color: #c33;
+        }
+        
         .footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 50px;
+            padding: 30px;
             color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .protected-notice {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .protected-notice span {
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>🔒 Clawd Security & Performance Showcase</h1>
-    
-    <div class="section-title">⚡ Performance Audit</div>
-    
-    <div class="report-card">
-        <h2>Performance Audit Report <span class="badge badge-score">Score: 100/100 🟢</span></h2>
-        <p><strong>Performance Audit Framework Results</strong></p>
-        <p>Comprehensive web performance testing including load times, resource optimization, caching, compression, and CDN analysis. Target achieved excellent performance metrics.</p>
-        <a href="performance-report.html" class="btn btn-performance">View Performance Report</a>
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="login-box">
+            <div class="lock-icon">🔒</div>
+            <h1>Clawd Showcase</h1>
+            <p class="subtitle">Security & Performance Audit Reports<br>Authentication Required</p>
+            
+            <div class="error-message" id="errorMsg">
+                ⚠️ Invalid credentials. Please try again.
+            </div>
+            
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            
+            <button class="login-btn" onclick="login()">Access Reports</button>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                Protected content. Authorized access only.
+            </p>
+        </div>
     </div>
     
-    <div class="section-title">🔐 Security Audits</div>
-    
-    <div class="report-card">
-        <h2>Security Report v2.0 <span class="badge badge-new">NEW</span></h2>
-        <p><strong>OWASP Security Audit Framework Results</strong></p>
-        <p>Automated comprehensive security testing demonstrating the OWASP Framework capabilities. Includes comparison between manual and automated testing, performance metrics, and framework validation results.</p>
-        <a href="security-report-v2.html" class="btn">View Report v2.0</a>
+    <!-- Main Content -->
+    <div id="mainContent">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        
+        <div class="header">
+            <h1>🔒 Clawd Security & Performance Showcase</h1>
+            <p class="subtitle">Confidential Audit Reports</p>
+        </div>
+        
+        <div class="protected-notice">
+            <span>🔐</span> You are viewing protected content. All reports are confidential.
+        </div>
+        
+        <div class="section-title">⚡ Performance Audit</div>
+        
+        <div class="report-card">
+            <h2>Performance Audit Report <span class="badge badge-score">Score: 100/100 🟢</span></h2>
+            <p><strong>Performance Audit Framework Results</strong></p>
+            <p>Comprehensive web performance testing including load times (0.52s avg), resource optimization (43KB HTML), caching, compression (72-75% savings), and CDN analysis. Target achieved excellent performance metrics.</p>
+            <a href="performance-report.html" class="btn btn-performance">View Performance Report</a>
+        </div>
+        
+        <div class="section-title">🔐 Security Audits</div>
+        
+        <div class="report-card">
+            <h2>Security Report v2.0 <span class="badge badge-new">LATEST</span></h2>
+            <p><strong>OWASP Security Audit Framework Results</strong></p>
+            <p>Automated comprehensive security testing with 8 vulnerabilities identified (2 CRITICAL, 4 HIGH, 2 MEDIUM). Includes detailed comparison between manual and automated testing, and complete OWASP Top 10 coverage.</p>
+            <a href="security-report-v2.html" class="btn">View Report v2.0</a>
+        </div>
+        
+        <div class="report-card">
+            <h2>Security Report v1.0</h2>
+            <p><strong>Manual Security Assessment</strong></p>
+            <p>Original manual security audit report covering 7 vulnerabilities with detailed findings, proof of concepts, remediation steps, and security recommendations.</p>
+            <a href="security-report.html" class="btn">View Report v1.0</a>
+        </div>
+        
+        <div class="report-card">
+            <h2>Framework Documentation</h2>
+            <p><strong>OWASP Framework Execution Details</strong></p>
+            <p>Detailed markdown documentation of the OWASP Framework execution against Infinite Electronics, showing correlation between manual and automated testing results.</p>
+            <a href="owasp-framework-demo-results.md" class="btn">View Documentation</a>
+        </div>
+        
+        <div class="footer">
+            <p>🔒 Confidential Reports | Generated by Andres & Clawd 🤝</p>
+            <p>February 5, 2026</p>
+        </div>
     </div>
     
-    <div class="report-card">
-        <h2>Security Report v1.0</h2>
-        <p><strong>Manual Security Assessment</strong></p>
-        <p>Original manual security audit report covering 7 vulnerabilities (2 CRITICAL, 3 HIGH, 2 MEDIUM) with detailed findings, proof of concepts, and remediation steps.</p>
-        <a href="security-report.html" class="btn">View Report v1.0</a>
-    </div>
-    
-    <div class="report-card">
-        <h2>Framework Demo Results</h2>
-        <p><strong>Markdown Documentation</strong></p>
-        <p>Detailed documentation of the OWASP Framework execution against Infinite Electronics, showing correlation between manual and automated testing results.</p>
-        <a href="owasp-framework-demo-results.md" class="btn">View Documentation</a>
-    </div>
-    
-    <div class="footer">
-        <p>🔒 Confidential Reports | Generated by Andres & Clawd 🤝</p>
-        <p>February 5, 2026</p>
-    </div>
+    <script>
+        const VALID_USERNAME = 'admin';
+        const VALID_PASSWORD = 'audit2026';
+        const AUTH_KEY = 'clawd_showcase_auth';
+        
+        // Check if already authenticated
+        window.onload = function() {
+            if (sessionStorage.getItem(AUTH_KEY) === 'true') {
+                showMainContent();
+            }
+        };
+        
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                sessionStorage.setItem(AUTH_KEY, 'true');
+                showMainContent();
+                errorMsg.style.display = 'none';
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        }
+        
+        function logout() {
+            sessionStorage.removeItem(AUTH_KEY);
+            location.reload();
+        }
+        
+        function showMainContent() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)';
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
+    </script>
 </body>
 </html>

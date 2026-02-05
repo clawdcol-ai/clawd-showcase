@@ -320,33 +320,8 @@
     </style>
 </head>
 <body>
-    <!-- Login Modal -->
-    <div id="loginModal">
-        <div class="login-box">
-            <div class="lock-icon">🔒</div>
-            <h2>OWASP Audit Report v2.0</h2>
-            <p class="subtitle">Automated Security Assessment - Authentication Required</p>
-            
-            <div class="error-message" id="errorMsg">
-                ⚠️ Invalid credentials. Please try again.
-            </div>
-            
-            <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" autocomplete="off">
-            </div>
-            
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password">
-            </div>
-            
-            <button onclick="login()">Access Report</button>
-        </div>
-    </div>
-    
     <!-- Report Content -->
-    <div id="reportContent">
+    <div id="reportContent" style="display: block;">
         <button class="logout-btn" onclick="logout()">Logout</button>
         
         <div class="report-header">
@@ -1001,38 +976,20 @@ Sending 10 requests in rapid succession...
     </div>
     
     <script>
-        const VALID_USERNAME = 'admin';
-        const VALID_PASSWORD = 'audit2026';
+        const AUTH_KEY = 'clawd_showcase_auth';
         
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('errorMsg');
-            
-            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('reportContent').style.display = 'block';
-                document.body.style.background = '#f5f7fa';
-                errorMsg.style.display = 'none';
-            } else {
-                errorMsg.style.display = 'block';
-                document.getElementById('password').value = '';
+        // Check authentication on page load
+        window.onload = function() {
+            if (sessionStorage.getItem(AUTH_KEY) !== 'true') {
+                // Redirect to index if not authenticated
+                window.location.href = 'index.html';
             }
-        }
+        };
         
         function logout() {
-            document.getElementById('loginModal').style.display = 'flex';
-            document.getElementById('reportContent').style.display = 'none';
-            document.body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            sessionStorage.removeItem(AUTH_KEY);
+            window.location.href = 'index.html';
         }
-        
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
     </script>
 </body>
 </html>
